@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Birthday Portal - Celebration</title>
+  <style>
+    :root {
+      --primary: #9b51e0;
+      --primary-dark: #0f0c20;
+      --secondary: #ff2a85;
+      --accent: #ffb703;
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --radius: 16px;
+      --shadow: 0 8px 32px 0 rgba(155, 81, 224, 0.25);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, html { height: 100%; font-family: var(--font); color: var(--text); background: #0f0c20; overflow-x: hidden; }
+
+    /* ===================================================
+       1. ANIMATED INTRO SCREEN (CANVAS & OVERLAY)
+       =================================================== */
+    #introOverlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #0f0c20; z-index: 1000; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; opacity: 1;
+      transition: opacity 1s ease-in-out;
+    }
+    #introOverlay.fade-out { opacity: 0; pointer-events: none; }
+    #cakeCanvas { background: transparent; max-width: 100%; max-height: 80vh; }
+
+    /* ===================================================
+       2. MAIN DASHBOARD LAYOUT
+       =================================================== */
+    .dashboard-bg {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #1a0933 50%, #2b0845 100%);
+      display: flex; flex-direction: column; align-items: center; padding: 20px;
+    }
+
+    .nav-bar {
+      width: 100%; max-width: 1100px; display: flex; justify-content: space-between;
+      align-items: center; padding: 15px 25px; 
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 25px;
+    }
+    .nav-title { font-size: 1.4rem; font-weight: bold; color: #ffffff; }
+    .logout-btn {
+      padding: 8px 18px; font-size: 0.9rem; background: linear-gradient(45deg, var(--secondary), var(--primary));
+      color: #fff; border: none; cursor: pointer; border-radius: 20px; font-weight: bold; transition: transform 0.2s;
+      box-shadow: 0 4px 15px rgba(255, 42, 133, 0.4);
+    }
+    .logout-btn:hover { transform: scale(1.05); }
+
+    .main-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 25px;
+      width: 100%; max-width: 1100px;
+    }
+
+    @media (max-width: 768px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* VIP Midnight Glow CSS Sample */
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px 0 rgba(155, 81, 224, 0.25);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 30px; display: flex; flex-direction: column;
+      align-items: center; text-align: center; position: relative;
+    }
+
+    /* ===================================================
+       3. LEFT PANEL: GREETINGS & ENVELOPE
+       =================================================== */
+    .action-btn {
+      background: linear-gradient(45deg, var(--secondary), #ff6b6b); color: white;
+      border: none; padding: 12px 24px; border-radius: 25px; font-weight: bold;
+      font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 42, 133, 0.4);
+      transition: all 0.3s ease; margin-bottom: 25px;
+    }
+    .action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 42, 133, 0.6); }
+
+    /* Envelope Styles */
+    .envelope-wrapper {
+      position: relative; width: 280px; height: 180px; background-color: #8338ec;
+      border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3); cursor: pointer; perspective: 1000px;
+      margin: 40px 0 20px 0; display: none; opacity: 0; transition: opacity 0.5s ease;
+    }
+    .envelope-wrapper.visible { display: block; opacity: 1; }
+    .envelope-flap {
+      position: absolute; top: 0; left: 0; width: 0; height: 0;
+      border-left: 140px solid transparent; border-right: 140px solid transparent;
+      border-top: 100px solid #9b51e0; transform-origin: top; transition: transform 0.6s ease 0.4s; z-index: 5;
+    }
+    .envelope-seal { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); font-size: 24px; z-index: 6; }
+    .envelope-pocket {
+      position: absolute; bottom: 0; left: 0; width: 0; height: 0;
+      border-left: 140px solid #7014d0; border-right: 140px solid #7014d0;
+      border-bottom: 90px solid #5a0eb1; border-top: 90px solid transparent;
+      border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 4;
+    }
+    .letter {
+      position: absolute; bottom: 10px; left: 10px; width: 260px; min-height: 180px;
+      background: #1c1538; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 15px; box-sizing: border-box;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4); z-index: 3;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.6s, opacity 0.8s ease 0.6s; opacity: 0;
+      color: #ffffff; display: flex; flex-direction: column; justify-content: space-between;
+    }
+
+    .envelope-wrapper.open { transform: translateY(60px); cursor: default; }
+    .envelope-wrapper.open .envelope-flap { transform: rotateX(180deg); z-index: 1; }
+    .envelope-wrapper.open .envelope-seal { opacity: 0; }
+    .envelope-wrapper.open .letter { transform: translateY(-160px); z-index: 10; opacity: 1; }
+
+    .letter-title-wrapper {
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 2px dashed rgba(255,255,255,0.2); padding-bottom: 5px; margin-bottom: 8px;
+    }
+    .letter-title { color: var(--secondary); font-size: 1rem; margin: 0; }
+    .greeting-counter { font-size: 0.75rem; color: var(--accent); font-weight: bold; }
+    .greeting-body { font-size: 0.85rem; line-height: 1.4; color: #e0e0e0; flex-grow: 1; }
+    
+    .greeting-image {
+      width: 100%;
+      max-height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* Greeting Pagination Nav Controls */
+    .greeting-controls {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .nav-card-btn {
+      background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff; font-size: 0.75rem; padding: 4px 10px; border-radius: 12px;
+      cursor: pointer; font-weight: bold; transition: all 0.2s ease;
+    }
+    .nav-card-btn:hover:not(:disabled) { background: var(--secondary); border-color: var(--secondary); }
+    .nav-card-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ===================================================
+       4. RIGHT PANEL: CELEBRANT CARD
+       =================================================== */
+    .profile-avatar {
+      width: 140px; height: 140px; border-radius: 50%; border: 4px solid var(--secondary);
+      object-fit: cover; box-shadow: 0 8px 20px rgba(155, 81, 224, 0.4); margin-bottom: 15px;
+    }
+    .celebrant-name { font-size: 1.6rem; font-weight: bold; color: #ffffff; margin-bottom: 5px; }
+    .celebrant-title { font-size: 0.95rem; color: var(--secondary); font-weight: 600; margin-bottom: 15px; }
+    .decorative-stars { font-size: 1.2rem; color: var(--accent); }
+  </style>
+</head>
+<body class="dashboard-bg">
+
+  <!-- INTRO CANVAS ANIMATION OVERLAY -->
+  <div id="introOverlay">
+    <canvas id="cakeCanvas" width="500" height="500"></canvas>
+  </div>
+
+  <!-- MAIN DASHBOARD CONTENT -->
+  <header class="nav-bar">
+    <div class="nav-title">🎉 Birthday Portal</div>
+    <button id="logoutBtn" class="logout-btn">🚪 Log Out</button>
+  </header>
+
+  <main class="main-grid">
+    <!-- LEFT PANEL: INTERACTIVE GREETINGS BUTTON & ENVELOPE -->
+    <section class="card">
+      <h2 style="color: var(--secondary); margin-bottom: 15px;">Celebration Area</h2>
+      <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px; font-size: 0.9rem;">Click below to reveal your birthday greetings!</p>
+      
+      <button id="greetingsBtn" class="action-btn">✉️ Open Greetings</button>
+
+      <div class="envelope-wrapper" id="envelope">
+        <div class="envelope-flap"></div>
+        <div class="envelope-seal">💌</div>
+        <div class="envelope-pocket"></div>
+        <div class="letter" id="letter">
+          <div>
+            <div class="letter-title-wrapper">
+              <h3 class="letter-title">Dear Celebrant,</h3>
+              <span id="greetingCounter" class="greeting-counter">1 / 1</span>
+            </div>
+            <div class="greeting-body" id="userGreetingText">
+              Wishing you a wonderful birthday filled with warmth, joy, and unforgettable moments! May this year bring you closer to all your dreams. 🎂✨
+            </div>
+            <img id="userGreetingImage" class="greeting-image" alt="Celebration Image" />
+          </div>
+
+          <!-- Multiple Greetings Navigation -->
+          <div class="greeting-controls" id="greetingControls" style="display: none;">
+            <button id="prevGreetingBtn" class="nav-card-btn" disabled>◀ Prev</button>
+            <button id="nextGreetingBtn" class="nav-card-btn">Next ▶</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: CELEBRANT PROFILE & DISPLAY -->
+    <section class="card">
+      <img src="https://via.placeholder.com/150" alt="Celebrant Picture" class="profile-avatar" id="celebrantImg">
+      <h2 class="celebrant-name" id="celebrantName">Happy Birthday!</h2>
+      <p class="celebrant-title">✨ Today's Guest of Honor ✨</p>
+      <div class="decorative-stars">🎈 🎁 🎂 🥳 💖</div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabaseClient.js"></script>
+
+  <script>
+    // Replace this with your actual Supabase Admin User ID
+    const ADMIN_USER_ID = "00000000-0000-0000-0000-000000000000"; 
+
+    // State array for user greetings
+    let userGreetingsList = [];
+    let currentGreetingIndex = 0;
+
+    /**
+     * Connects the currently logged-in user to the Admin account
+     */
+    async function connectUserToAdmin() {
+      if (!window.supabaseClient) return;
+
+      const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
+
+      if (userError || !user) {
+        console.error("No logged-in user found.");
+        return;
+      }
+
+      if (user.id === ADMIN_USER_ID) {
+        console.log("Logged-in user is already the admin.");
+        return;
+      }
+
+      const { data, error } = await window.supabaseClient
+        .from('user_connections')
+        .upsert(
+          { user_id: user.id, admin_id: ADMIN_USER_ID },
+          { onConflict: 'user_id,admin_id' }
+        );
+
+      if (error) {
+        console.error("Error connecting user to admin:", error.message);
+      } else {
+        console.log("Successfully connected user to admin account!");
+      }
+    }
+
+    /**
+     * Renders the current greeting based on active index
+     */
+    function renderCurrentGreeting() {
+      if (userGreetingsList.length === 0) return;
+
+      const current = userGreetingsList[currentGreetingIndex];
+      const textElem = document.getElementById('userGreetingText');
+      const imgElem = document.getElementById('userGreetingImage');
+      const counterElem = document.getElementById('greetingCounter');
+      const prevBtn = document.getElementById('prevGreetingBtn');
+      const nextBtn = document.getElementById('nextGreetingBtn');
+      const controlsElem = document.getElementById('greetingControls');
+
+      // Update text
+      if (current.greeting_text) {
+        textElem.textContent = current.greeting_text;
+      } else {
+        textElem.textContent = "";
+      }
+
+      // Update image
+      if (current.image_url) {
+        imgElem.src = current.image_url;
+        imgElem.style.display = 'block';
+      } else {
+        imgElem.style.display = 'none';
+      }
+
+      // Update counter
+      counterElem.textContent = `${currentGreetingIndex + 1} / ${userGreetingsList.length}`;
+
+      // Update controls visibility and disabled states
+      if (userGreetingsList.length > 1) {
+        controlsElem.style.display = 'flex';
+        prevBtn.disabled = (currentGreetingIndex === 0);
+        nextBtn.disabled = (currentGreetingIndex === userGreetingsList.length - 1);
+      } else {
+        controlsElem.style.display = 'none';
+      }
+    }
+
+    /**
+     * Fetches custom greetings sent by the admin from Supabase
+     */
+    async function loadUserGreeting(currentUser) {
+      if (!window.supabaseClient || !currentUser) return;
+
+      const { data, error } = await window.supabaseClient
+        .from('user_greetings')
+        .select('greeting_text, image_url, created_at')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Error fetching greetings:", error.message);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        userGreetingsList = data;
+        currentGreetingIndex = 0;
+        renderCurrentGreeting();
+      }
+    }
+
+    // ----------------------------------------------------
+    // 1. INTRO CAKE CANVAS ANIMATION FUNCTION
+    // ----------------------------------------------------
+    const canvas = document.getElementById("cakeCanvas");
+    const ctx = canvas.getContext("2d");
+    const overlay = document.getElementById("introOverlay");
+    let progress = 0;
+
+    function drawCakeAnimation() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width / 2;
+      const cakeScale = Math.min(progress / 50, 1);
+      
+      if (progress > 10) {
+        // Bottom Layer
+        ctx.fillStyle = "#ffb703";
+        ctx.fillRect(cx - 100 * cakeScale, 320, 200 * cakeScale, 70);
+
+        // Middle Frosting Line
+        ctx.fillStyle = "#ff2a85";
+        ctx.fillRect(cx - 100 * cakeScale, 320, 200 * cakeScale, 15);
+      }
+
+      if (progress > 30) {
+        // Top Layer
+        ctx.fillStyle = "#9b51e0";
+        ctx.fillRect(cx - 70 * cakeScale, 260, 140 * cakeScale, 60);
+
+        // Top Frosting Drips
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(cx - 70 * cakeScale, 260, 140 * cakeScale, 12);
+      }
+
+      if (progress > 50) {
+        // Candle
+        ctx.fillStyle = "#ff2a85";
+        ctx.fillRect(cx - 5, 220, 10, 40);
+
+        // Flame
+        ctx.beginPath();
+        ctx.arc(cx, 212, 7, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffb703";
+        ctx.fill();
+      }
+
+      if (progress > 60) {
+        // Animated Text
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 32px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("✨ Happy Birthday! ✨", cx, 140);
+      }
+
+      if (progress > 80) {
+        // Decorative Confetti
+        for (let i = 0; i < 20; i++) {
+          ctx.fillStyle = i % 2 === 0 ? "#ff2a85" : "#ffb703";
+          ctx.beginPath();
+          ctx.arc((cx - 180) + (i * 18), 80 + Math.sin(i + progress * 0.1) * 15, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      progress += 1;
+
+      if (progress < 130) {
+        requestAnimationFrame(drawCakeAnimation);
+      } else {
+        // Fade out animation overlay and unveil dashboard
+        setTimeout(() => {
+          overlay.classList.add("fade-out");
+          setTimeout(() => overlay.style.display = "none", 1000);
+        }, 800);
+      }
+    }
+
+    // ----------------------------------------------------
+    // 2. AUTH, SUPABASE DATA RETRIEVAL & INITIALIZATION
+    // ----------------------------------------------------
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (!window.supabaseClient) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      // 1. Get current logged-in user
+      const { data: { user }, error: authError } = await window.supabaseClient.auth.getUser();
+
+      if (authError || !user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      // 2. Fetch profile avatar URL from the 'profiles' table
+      const { data: profile, error: profileError } = await window.supabaseClient
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      const celebrantImg = document.getElementById('celebrantImg');
+
+      if (profile && profile.avatar_url && celebrantImg) {
+        // Add timestamp cache-buster so browser doesn't load stale cached image
+        celebrantImg.src = `${profile.avatar_url}?t=${new Date().getTime()}`;
+      } else if (user.user_metadata?.avatar_url && celebrantImg) {
+        celebrantImg.src = user.user_metadata.avatar_url;
+      }
+
+      // 3. Listen for Realtime Changes to instantly update photo without page refresh
+      window.supabaseClient
+        .channel('public:profiles')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` }, payload => {
+          if (payload.new && payload.new.avatar_url && celebrantImg) {
+            celebrantImg.src = `${payload.new.avatar_url}?t=${new Date().getTime()}`;
+          }
+        })
+        .subscribe();
+
+      // 4. Extract user info and render UI elements
+      const userMeta = user.user_metadata || {};
+      const nickname = userMeta.nickname || user.email.split("@")[0];
+      document.getElementById("celebrantName").textContent = nickname;
+
+      // 5. Auto-connect user to admin upon dashboard load
+      await connectUserToAdmin();
+
+      // 6. Load custom greetings & images sent by the admin
+      await loadUserGreeting(user);
+
+      // 7. Start Intro Cake Animation
+      drawCakeAnimation();
+
+      // 8. Envelope open handler
+      const greetingsBtn = document.getElementById("greetingsBtn");
+      const envelope = document.getElementById("envelope");
+
+      greetingsBtn.addEventListener("click", () => {
+        envelope.classList.add("visible");
+        setTimeout(() => {
+          envelope.classList.add("open");
+        }, 300);
+      });
+
+      // 9. Navigation buttons event listeners for multiple greetings
+      document.getElementById("prevGreetingBtn").addEventListener("click", () => {
+        if (currentGreetingIndex > 0) {
+          currentGreetingIndex--;
+          renderCurrentGreeting();
+        }
+      });
+
+      document.getElementById("nextGreetingBtn").addEventListener("click", () => {
+        if (currentGreetingIndex < userGreetingsList.length - 1) {
+          currentGreetingIndex++;
+          renderCurrentGreeting();
+        }
+      });
+    });
+
+    // Logout Handler
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      if (window.supabaseClient) {
+        await window.supabaseClient.auth.signOut();
+      }
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>
