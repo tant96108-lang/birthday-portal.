@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In - Birthday Portal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="birthday-bg">
+
+  <!-- Background Floating Decorative Elements -->
+  <div class="balloon balloon-1">🎈</div>
+  <div class="balloon balloon-2">🎈</div>
+  <div class="confetti confetti-1">✨</div>
+  <div class="confetti confetti-2">🎉</div>
+
+  <div class="auth-container">
+    <div class="card birthday-card">
+      <div class="header-icon">🎉</div>
+      <h2>Happy birthday MIMI!
+        unta okay ra sa imoha ni og salamat sa pag salig godbless you more once again happy birthday☺️🤟 
+      </h2>
+      <p></p>
+
+      <form id="loginForm">
+        <div class="input-group">
+          <label for="loginPassword"</label>
+
+        </div>
+
+        <button type="submit" id="loginBtn" class="primary-btn celebration-btn">
+          ✨ 
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 1. Supabase CDN Library (MUST BE FIRST) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- 2. Global Supabase Client Init (MUST BE SECOND) -->
+  <script src="supabaseClient.js"></script>
+
+  <!-- 3. Login JavaScript Logic (MUST BE LAST) -->
+  <script src="login.js"></script>
+</body>
+</html>
