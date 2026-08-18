@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday Marian! 🎉</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Global Setup */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body.birthday-bg {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      overflow: hidden;
+      position: relative;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Canvas overlay for Confetti, Fireworks & Morphing Animation */
+    #celebrationCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    #celebrationCanvas.interactive {
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    /* Floating Balloons Background Decor */
+    .balloon-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .balloon {
+      position: absolute;
+      bottom: -120px;
+      width: 52px;
+      height: 68px;
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+      opacity: 0.85;
+      animation: floatUp 10s linear infinite;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.1s ease;
+    }
+
+    .balloon::after {
+      content: "";
+      position: absolute;
+      bottom: -12px;
+      left: 24px;
+      width: 2px;
+      height: 16px;
+      background: rgba(0,0,0,0.25);
+    }
+
+    /* Pop Animation Effect */
+    .balloon.popping {
+      animation: popBurst 0.25s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+      pointer-events: none;
+    }
+
+    @keyframes popBurst {
+      0% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.4); opacity: 0.9; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    .b1 { left: 8%; background: #ff4757; animation-delay: 0s; animation-duration: 9s; }
+    .b2 { left: 22%; background: #ffa502; animation-delay: 2s; animation-duration: 11s; }
+    .b3 { left: 75%; background: #2ed573; animation-delay: 1s; animation-duration: 10s; }
+    .b4 { left: 88%; background: #1e90ff; animation-delay: 3s; animation-duration: 8s; }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0.85; }
+      100% { transform: translateY(-110vh) rotate(20deg); opacity: 0; }
+    }
+
+    /* Container */
+    .auth-container {
+      width: 90%;
+      max-width: 460px;
+      padding: 20px;
+      z-index: 10;
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    /* Glass Card Styling with Glow Effects */
+    .card.birthday-card.glowing-card {
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      border-radius: 28px;
+      padding: 38px 28px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 
+                  0 0 35px rgba(255, 255, 255, 0.65);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      position: relative;
+    }
+
+    .card.birthday-card.glowing-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.12), 
+                  0 0 45px rgba(255, 182, 193, 0.85);
+    }
+
+    /* 3D SVG Cake Wrapper */
+    .cake-svg-wrapper {
+      width: 220px;
+      height: 190px;
+      margin: 10px auto 10px auto;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+
+    .cake-svg-wrapper svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      filter: drop-shadow(0 14px 20px rgba(0,0,0,0.22));
+    }
+
+    /* Knife Animation */
+    .knife {
+      opacity: 0;
+      transform-origin: center;
+      transition: all 0.2s ease;
+    }
+
+    .knife.cutting {
+      animation: knifeCut 0.5s ease-in-out forwards;
+    }
+
+    @keyframes knifeCut {
+      0% { opacity: 0; transform: translate(30px, -40px) rotate(-25deg); }
+      30% { opacity: 1; transform: translate(0px, 0px) rotate(-15deg); }
+      60% { transform: translate(-10px, 20px) rotate(-10deg); }
+      100% { opacity: 0; transform: translate(-20px, 30px) rotate(0deg); }
+    }
+
+    /* Slice Sliding Transformation */
+    .slice-piece {
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+    }
+
+    .slice-piece.sliced-1 { transform: translate(35px, 20px); opacity: 0; }
+    .slice-piece.sliced-2 { transform: translate(25px, -30px); opacity: 0; }
+    .slice-piece.sliced-3 { transform: translate(-25px, -30px); opacity: 0; }
+    .slice-piece.sliced-4 { transform: translate(-35px, 20px); opacity: 0; }
+    .slice-piece.sliced-5 { transform: translate(0px, 40px); opacity: 0; }
+
+    /* Candle Flame Flickering */
+    .flame {
+      animation: flicker 1.5s infinite alternate ease-in-out;
+      transform-origin: center bottom;
+    }
+
+    @keyframes flicker {
+      0% { transform: scale(1) rotate(-2deg); opacity: 1; }
+      100% { transform: scale(1.18) rotate(4deg); opacity: 0.85; }
+    }
+
+    /* Hint and Message Text */
+    .slice-hint {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #ff4757;
+      margin-bottom: 12px;
+      transition: opacity 0.3s ease;
+    }
+
+    .enjoy-message {
+      display: none;
+      font-family: 'Fredoka', cursive;
+      font-size: 2rem;
+      color: #ff4757;
+      margin: 15px 0;
+      text-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+    }
+
+    /* Rainbow Title */
+    .birthday-title {
+      font-family: 'Fredoka', cursive;
+      font-size: 2.1rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #ff416c, #ff4b2b, #8a2387, #e94057, #ff416c);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: shineText 4s linear infinite;
+    }
+
+    @keyframes shineText {
+      to { background-position: 200% center; }
+    }
+
+    /* Message Box */
+    .greeting-message {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #334155;
+      background: rgba(255, 255, 255, 0.65);
+      padding: 18px 22px;
+      border-radius: 18px;
+      border: 1.5px dashed rgba(255, 182, 193, 0.9);
+      backdrop-filter: blur(6px);
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .greeting-message:hover {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: #ff7675;
+    }
+  </style>
+</head>
+<body class="birthday-bg">
+
+  <!-- Canvas for Confetti, Fireworks, and Particle Morphing -->
+  <canvas id="celebrationCanvas"></canvas>
+
+  <!-- Background Floating Balloons -->
+  <div class="balloon-container" id="balloonContainer">
+    <div class="balloon b1"></div>
+    <div class="balloon b2"></div>
+    <div class="balloon b3"></div>
+    <div class="balloon b4"></div>
+  </div>
+
+  <div class="auth-container animate__animated animate__zoomIn" id="mainContainer">
+    <div class="card birthday-card glowing-card">
+
+      <!-- Interactive 3D Layered Chocolate SVG Cake -->
+      <div class="cake-svg-wrapper animate__animated animate__bounceInDown animate__delay-1s" id="cakeWrapper">
+        <svg viewBox="0 0 200 180" id="cakeSvg">
+          <!-- Plate -->
+          <ellipse cx="100" cy="148" rx="88" ry="24" fill="#CBD5E1"/>
+          <ellipse cx="100" cy="145" rx="80" ry="21" fill="#F8FAFC"/>
+
+          <!-- Base Plate Shadow -->
+          <ellipse cx="100" cy="120" rx="60" ry="20" fill="#291209"/>
+
+          <!-- SLICE 1 (Front Right) -->
+          <g id="slice-1" class="slice-piece">
+            <path d="M 135,137 L 160,120 L 160,80 L 135,97 Z" fill="#3D1C06"/>
+            <path d="M 100,120 L 135,137 L 135,125 L 100,108 Z" fill="#54290C"/>
+            <path d="M 100,108 L 135,125 L 135,120 L 100,103 Z" fill="#FFF8DC"/>
+            <path d="M 100,103 L 135,120 L 135,108 L 100,91 Z" fill="#54290C"/>
+            <path d="M 100,91 L 135,108 L 135,103 L 100,86 Z" fill="#FFF8DC"/>
+            <path d="M 100,86 L 135,103 L 135,97 L 100,80 Z" fill="#54290C"/>
+            <path d="M 100,80 L 160,80 A 60 20 0 0 1 135,97 Z" fill="#2B1103"/>
+          </g>
+
+          <!-- SLICE 2 (Back Right) -->
+          <g id="slice-2" class="slice-piece">
+            <path d="M 135,98 L 160,120 L 160,80 L 135,58 Z" fill="#2B1103"/>
+            <path d="M 100,80 L 135,58 A 60 20 0 0 1 160,80 Z" fill="#3D1C06"/>
+          </g>
+
+          <!-- SLICE 3 (Back Left) -->
+          <g id="slice-3" class="slice-piece">
+            <path d="M 65,98 L 135,98 L 135,58 L 65,58 Z" fill="#1C0A02"/>
+            <path d="M 100,80 L 65,58 A 60 20 0 0 1 135,58 Z" fill="#2B1103"/>
+          </g>
+
+          <!-- SLICE 4 (Front Left) -->
+          <g id="slice-4" class="slice-piece">
+            <path d="M 40,120 L 65,98 L 65,58 L 40,80 Z" fill="#2B1103"/>
+            <path d="M 100,80 L 40,80 A 60 20 0 0 1 65,58 Z" fill="#3D1C06"/>
+          </g>
+
+          <!-- SLICE 5 (Center Front) -->
+          <g id="slice-5" class="slice-piece">
+            <path d="M 65,137 L 100,120 L 100,80 L 65,97 Z" fill="#54290C"/>
+            <path d="M 65,125 L 100,108 L 100,103 L 65,120 Z" fill="#FFF8DC"/>
+            <path d="M 65,108 L 100,91 L 100,86 L 65,103 Z" fill="#FFF8DC"/>
+            <path d="M 65,137 L 135,137 L 135,97 L 65,97 Z" fill="#3D1C06"/>
+            <path d="M 100,80 L 65,97 A 60 20 0 0 1 135,97 Z" fill="#2B1103"/>
+          </g>
+
+          <!-- Decorative Toppings -->
+          <g id="toppings">
+            <circle cx="100" cy="74" r="5" fill="#DC2626"/>
+            <path d="M 100,74 Q 104,68 108,66" stroke="#15803D" stroke-width="1.5" fill="none"/>
+            <circle cx="125" cy="84" r="3.5" fill="#451A03"/>
+            <circle cx="75" cy="84" r="3.5" fill="#451A03"/>
+          </g>
+
+          <!-- Candle -->
+          <g id="candleGroup">
+            <rect x="97" y="48" width="6" height="28" rx="3" fill="#F472B6"/>
+            <path class="flame" d="M 100,35 Q 105,43 100,48 Q 95,43 100,35 Z" fill="#F59E0B"/>
+          </g>
+
+          <!-- Cutting Knife -->
+          <g id="knife" class="knife">
+            <path d="M 0,0 L 40,-15 L 45,-10 L 5,10 Z" fill="#94A3B8"/>
+            <path d="M 40,-15 L 65,-25 L 68,-20 L 45,-10 Z" fill="#451A03"/>
+          </g>
+        </svg>
+      </div>
+
+      <p class="slice-hint" id="sliceHint">Tap the chocolate cake to cut a slice! (0/5)</p>
+
+      <div class="enjoy-message animate__animated" id="enjoyMessage">
+        ✨ Enjoy your day! 🎉
+      </div>
+
+      <h1 class="birthday-title animate__animated animate__fadeInDown rainbow-text">Happy Birthday, MIMI! ✨</h1>
+
+      <p class="greeting-message animate__animated animate__fadeInUp animate__delay-1s">
+        Unta okay ra sa imoha ni og salamat sa pag salig. God bless you more, once again happy birthday! ☺️🤟
+      </p>
+
+    </div>
+  </div>
+
+  <!-- Supabase CDN Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabaseClient.js"></script>
+  <script src="login.js"></script>
+
+  <!-- Interactive Logic + Balloon Popping + Canvas Animations -->
+  <script>
+    let currentSlice = 0;
+    const maxSlices = 5;
+
+    const cakeWrapper = document.getElementById('cakeWrapper');
+    const knife = document.getElementById('knife');
+    const sliceHint = document.getElementById('sliceHint');
+    const enjoyMessage = document.getElementById('enjoyMessage');
+    const mainContainer = document.getElementById('mainContainer');
+
+    /* --- Cake Cutting Interaction --- */
+    cakeWrapper.addEventListener('click', () => {
+      if (currentSlice < maxSlices) {
+        currentSlice++;
+
+        // Trigger knife chop animation
+        knife.classList.remove('cutting');
+        void knife.offsetWidth;
+        knife.classList.add('cutting');
+
+        // Delay slice separation
+        setTimeout(() => {
+          const sliceElem = document.getElementById(`slice-${currentSlice}`);
+          if (sliceElem) {
+            sliceElem.classList.add(`sliced-${currentSlice}`);
+          }
+        }, 200);
+
+        sliceHint.innerText = `Cutting... (${currentSlice}/${maxSlices})`;
+
+        // On 5th Slice: Trigger Fireworks & Confetti, then start 5-second countdown
+        if (currentSlice === maxSlices) {
+          setTimeout(() => {
+            sliceHint.style.display = 'none';
+
+            cakeWrapper.className = "cake-svg-wrapper animate__animated animate__zoomOut";
+
+            setTimeout(() => {
+              cakeWrapper.style.display = 'none';
+              enjoyMessage.style.display = 'block';
+              enjoyMessage.classList.add('animate__zoomInDown');
+              
+              // Trigger Celebration Effects immediately
+              startCelebrationEffects();
+
+              // 5 SECONDS TIMER: Fade out card -> Launch Particle System
+              setTimeout(() => {
+                mainContainer.style.opacity = '0';
+                mainContainer.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                  mainContainer.style.display = 'none';
+                }, 1000);
+
+                initInteractiveParticles();
+              }, 5000);
+
+            }, 400);
+
+          }, 800);
+        }
+      }
+    });
+
+    /* --- Balloon Popping Functionality --- */
+    function attachBalloonPopEvent(balloon) {
+      balloon.addEventListener('click', (e) => {
+        if (balloon.classList.contains('popping')) return;
+
+        const rect = balloon.getBoundingClientRect();
+        const posX = rect.left + rect.width / 2;
+        const posY = rect.top + rect.height / 2;
+        const color = window.getComputedStyle(balloon).backgroundColor;
+
+        balloon.classList.add('popping');
+        createPopParticles(posX, posY, color);
+
+        setTimeout(() => {
+          balloon.classList.remove('popping');
+          balloon.style.animation = 'none';
+          void balloon.offsetWidth;
+          balloon.style.animation = '';
+        }, 2000);
+      });
+    }
+
+    document.querySelectorAll('.balloon').forEach(attachBalloonPopEvent);
+
+    /* --- Canvas System --- */
+    const canvas = document.getElementById('celebrationCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let morphParticles = [];
+    let isMorphSystemActive = false;
+    let scatterTimeout = null;
+    let currentDisplayMode = 'bouquet'; // Toggle state: 'bouquet' or 'heart'
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    /* Helper: Draw Mini Heart */
+    function drawHeart(ctx, x, y, size, color) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      const topCurveHeight = size * 0.3;
+      ctx.moveTo(0, topCurveHeight);
+      ctx.bezierCurveTo(0, 0, -size / 2, 0, -size / 2, topCurveHeight);
+      ctx.bezierCurveTo(-size / 2, (size + topCurveHeight) / 2, 0, size, 0, size);
+      ctx.bezierCurveTo(0, size, size / 2, (size + topCurveHeight) / 2, size / 2, topCurveHeight);
+      ctx.bezierCurveTo(size / 2, 0, 0, 0, 0, topCurveHeight);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    /* Helper: Draw Mini Flower */
+    function drawFlower(ctx, x, y, size, color) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = color;
+      
+      // Petals
+      const petalCount = 5;
+      const petalRadius = size * 0.45;
+      for (let i = 0; i < petalCount; i++) {
+        const angle = (i / petalCount) * Math.PI * 2;
+        const px = Math.cos(angle) * petalRadius;
+        const py = Math.sin(angle) * petalRadius;
+        ctx.beginPath();
+        ctx.arc(px, py, petalRadius * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Yellow Center Core
+      ctx.fillStyle = '#f1c40f';
+      ctx.beginPath();
+      ctx.arc(0, 0, size * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    /* Standard Particles for Fireworks/Confetti */
+    class Particle {
+      constructor(x, y, isFirework = false, customColor = null) {
+        this.x = x;
+        this.y = y;
+        this.isFirework = isFirework;
+        this.colors = ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#e84393', '#74b9ff', '#fdcb6e'];
+        this.color = customColor || this.colors[Math.floor(Math.random() * this.colors.length)];
+        
+        if (isFirework) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 8 + 2;
+          this.vx = Math.cos(angle) * speed;
+          this.vy = Math.sin(angle) * speed;
+          this.size = Math.random() * 3 + 2;
+          this.gravity = 0.05;
+          this.opacity = 1;
+          this.decay = Math.random() * 0.02 + 0.015;
+        } else {
+          this.vx = (Math.random() - 0.5) * 8;
+          this.vy = (Math.random() - 0.5) * 8 - 2;
+          this.size = Math.random() * 6 + 3;
+          this.gravity = 0.15;
+          this.rotation = Math.random() * 360;
+          this.rotationSpeed = (Math.random() - 0.5) * 10;
+          this.opacity = 1;
+          this.decay = Math.random() * 0.02 + 0.015;
+        }
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += this.gravity;
+        this.opacity -= this.decay;
+        if (!this.isFirework) {
+          this.rotation += this.rotationSpeed;
+        }
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(this.opacity, 0);
+        ctx.fillStyle = this.color;
+        
+        if (this.isFirework) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.translate(this.x, this.y);
+          ctx.rotate((this.rotation * Math.PI) / 180);
+          ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size * 0.6);
+        }
+        ctx.restore();
+      }
+    }
+
+    function createPopParticles(x, y, color) {
+      if (!isMorphSystemActive && particles.length === 0) {
+        requestAnimationFrame(animateParticles);
+      }
+      for (let i = 0; i < 25; i++) {
+        particles.push(new Particle(x, y, false, color));
+      }
+    }
+
+    function createFirework(x, y) {
+      for (let i = 0; i < 60; i++) {
+        particles.push(new Particle(x, y, true));
+      }
+    }
+
+    function createConfettiBurst() {
+      for (let i = 0; i < 100; i++) {
+        particles.push(new Particle(window.innerWidth / 2, window.innerHeight / 2 + 50, false));
+      }
+    }
+
+    function animateParticles() {
+      if (isMorphSystemActive) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+        if (particles[i].opacity <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      if (particles.length > 0) {
+        requestAnimationFrame(animateParticles);
+      }
+    }
+
+    function startCelebrationEffects() {
+      animateParticles();
+      createConfettiBurst();
+      setTimeout(createConfettiBurst, 300);
+      setTimeout(createConfettiBurst, 600);
+
+      let fireworkCount = 0;
+      const interval = setInterval(() => {
+        const x = Math.random() * (canvas.width * 0.8) + canvas.width * 0.1;
+        const y = Math.random() * (canvas.height * 0.5) + canvas.height * 0.1;
+        createFirework(x, y);
+        fireworkCount++;
+        if (fireworkCount >= 8) clearInterval(interval);
+      }, 400);
+    }
+
+    /* --- Dual Particle Morphing Engine --- */
+    class MorphParticle {
+      constructor(startX, startY, targetX, targetY, color, size, shapeType) {
+        this.x = startX;
+        this.y = startY;
+        this.vx = (Math.random() - 0.5) * 18;
+        this.vy = (Math.random() - 0.5) * 18;
+        this.friction = 0.93;
+        
+        this.targetX = targetX;
+        this.targetY = targetY;
+        
+        this.color = color;
+        this.size = size;
+        this.shapeType = shapeType; // 'heart' or 'flower'
+        this.state = 'scatter';     // 'scatter' or 'form'
+        this.pulseAngle = Math.random() * Math.PI * 2;
+      }
+
+      scatterFrom(clickX, clickY) {
+        this.state = 'scatter';
+        const angle = Math.atan2(this.y - clickY, this.x - clickX) + (Math.random() - 0.5) * 0.6;
+        const speed = Math.random() * 24 + 10;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+      }
+
+      update() {
+        if (this.state === 'scatter') {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.vx *= this.friction;
+          this.vy *= this.friction;
+        } else if (this.state === 'form') {
+          // Smooth spring movement to targeted coordinate
+          this.x += (this.targetX - this.x) * 0.045;
+          this.y += (this.targetY - this.y) * 0.045;
+          this.pulseAngle += 0.03;
+        }
+      }
+
+      draw() {
+        const currentSize = this.state === 'form' 
+          ? this.size + Math.sin(this.pulseAngle) * 1.5 
+          : this.size;
+
+        if (this.shapeType === 'flower') {
+          drawFlower(ctx, this.x, this.y, currentSize, this.color);
+        } else {
+          drawHeart(ctx, this.x, this.y, currentSize, this.color);
+        }
+      }
+    }
+
+    /* Generator: Bouquet of Flowers (made of Mini Hearts) */
+    function generateBouquetPoints(centerX, centerY) {
+      const points = [];
+
+      const flowers = [
+        { cx: centerX - 70, cy: centerY - 90, petals: 6, radius: 45, petalColor: '#ff4757', coreColor: '#f1c40f' },
+        { cx: centerX + 70, cy: centerY - 90, petals: 6, radius: 45, petalColor: '#e84393', coreColor: '#f1c40f' },
+        { cx: centerX,      cy: centerY - 140, petals: 7, radius: 50, petalColor: '#ff6b81', coreColor: '#ffffff' },
+        { cx: centerX - 110,cy: centerY - 20, petals: 5, radius: 40, petalColor: '#ff7f50', coreColor: '#f1c40f' },
+        { cx: centerX + 110,cy: centerY - 20, petals: 5, radius: 40, petalColor: '#a55eea', coreColor: '#ffffff' },
+        { cx: centerX,      cy: centerY - 40, petals: 6, radius: 48, petalColor: '#ff416c', coreColor: '#f1c40f' }
+      ];
+
+      flowers.forEach(fl => {
+        const pointsPerFlower = 50;
+        for (let i = 0; i < pointsPerFlower; i++) {
+          const theta = (i / pointsPerFlower) * Math.PI * 2;
+          const petalR = fl.radius * (0.4 + 0.6 * Math.sin(fl.petals * theta));
+          points.push({
+            x: fl.cx + petalR * Math.cos(theta),
+            y: fl.cy + petalR * Math.sin(theta),
+            color: fl.petalColor,
+            size: Math.random() * 4 + 8,
+            shapeType: 'heart'
+          });
+        }
+        for (let c = 0; c < 8; c++) {
+          const r = Math.random() * (fl.radius * 0.25);
+          const a = Math.random() * Math.PI * 2;
+          points.push({
+            x: fl.cx + r * Math.cos(a),
+            y: fl.cy + r * Math.sin(a),
+            color: fl.coreColor,
+            size: Math.random() * 3 + 6,
+            shapeType: 'heart'
+          });
+        }
+      });
+
+      // Stems
+      const stemColors = ['#2ed573', '#26de81', '#10ac84'];
+      const stemTopY = centerY - 10;
+      const stemBottomY = centerY + 160;
+
+      for (let s = -4; s <= 4; s++) {
+        const topX = centerX + s * 22;
+        const bottomX = centerX + (s * 4);
+        const steps = 18;
+
+        for (let step = 0; step <= steps; step++) {
+          const progress = step / steps;
+          points.push({
+            x: topX + (bottomX - topX) * progress + (Math.random() - 0.5) * 4,
+            y: stemTopY + (stemBottomY - stemTopY) * progress,
+            color: stemColors[Math.floor(Math.random() * stemColors.length)],
+            size: Math.random() * 3 + 7,
+            shapeType: 'heart'
+          });
+        }
+      }
+
+      // Ribbon
+      const ribbonY = centerY + 100;
+      const ribbonColors = ['#ff4757', '#ffffff', '#ff6b81'];
+      for (let rx = -35; rx <= 35; rx += 4) {
+        for (let ry = -8; ry <= 8; ry += 4) {
+          points.push({
+            x: centerX + rx,
+            y: ribbonY + ry,
+            color: ribbonColors[Math.floor(Math.random() * ribbonColors.length)],
+            size: Math.random() * 2 + 7,
+            shapeType: 'heart'
+          });
+        }
+      }
+
+      return points;
+    }
+
+    /* Generator: Big Heart Outline & Fill (made of Mini Flowers) */
+    function generateHeartMadeOfFlowersPoints(centerX, centerY) {
+      const points = [];
+      const flowerColors = ['#ff4757', '#ff6b81', '#e84393', '#ff7f50', '#a55eea', '#ff416c', '#fd79a8'];
+      
+      const count = 380;
+      for (let i = 0; i < count; i++) {
+        // Parametric Heart Formula
+        const t = Math.random() * Math.PI * 2;
+        const fillFactor = Math.sqrt(Math.random()); // Even interior distribution
+        const scale = 14;
+
+        const x = scale * 16 * Math.pow(Math.sin(t), 3) * fillFactor;
+        const y = -scale * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * fillFactor;
+
+        points.push({
+          x: centerX + x,
+          y: centerY + y - 20,
+          color: flowerColors[Math.floor(Math.random() * flowerColors.length)],
+          size: Math.random() * 6 + 10,
+          shapeType: 'flower'
+        });
+      }
+
+      return points;
+    }
+
+    function initInteractiveParticles() {
+      isMorphSystemActive = true;
+      particles = [];
+      canvas.classList.add('interactive');
+
+      // Start with Mode 1: Bouquet of Flowers
+      currentDisplayMode = 'bouquet';
+      buildMorphParticles();
+
+      requestAnimationFrame(renderMorphAnimation);
+    }
+
+    function buildMorphParticles(clickX = canvas.width / 2, clickY = canvas.height / 2) {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2 + 20;
+
+      let targets = [];
+      if (currentDisplayMode === 'bouquet') {
+        targets = generateBouquetPoints(centerX, centerY);
+      } else {
+        targets = generateHeartMadeOfFlowersPoints(centerX, centerY);
+      }
+
+      morphParticles = [];
+      for (let i = 0; i < targets.length; i++) {
+        const t = targets[i];
+        const p = new MorphParticle(clickX, clickY, t.x, t.y, t.color, t.size, t.shapeType);
+        p.scatterFrom(clickX, clickY);
+        morphParticles.push(p);
+      }
+
+      if (scatterTimeout) clearTimeout(scatterTimeout);
+      scatterTimeout = setTimeout(() => {
+        morphParticles.forEach(p => p.state = 'form');
+      }, 1600);
+    }
+
+    /* --- Interactive Click Event: Scatter & Toggle Modes --- */
+    canvas.addEventListener('click', (e) => {
+      if (!isMorphSystemActive) return;
+
+      const clickX = e.clientX;
+      const clickY = e.clientY;
+
+      // Toggle Display Mode on Click
+      currentDisplayMode = (currentDisplayMode === 'bouquet') ? 'heart' : 'bouquet';
+
+      // Rebuild & Scatter Particles outward from click point
+      buildMorphParticles(clickX, clickY);
+    });
+
+    function renderMorphAnimation() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < morphParticles.length; i++) {
+        morphParticles[i].update();
+        morphParticles[i].draw();
+      }
+
+      requestAnimationFrame(renderMorphAnimation);
+    }
+  </script>
+</body>
+</html>
